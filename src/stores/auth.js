@@ -1,26 +1,33 @@
+// stores/auth.js
 import { defineStore } from "pinia";
-import api from "../api/api";
+import axios from "axios";
 
 export const useAuthStore = defineStore("auth", {
   state: () => ({
-    user: null,
     token: localStorage.getItem("token") || null,
+    userId: localStorage.getItem("userId") || null,
+    role: localStorage.getItem("role") || null
   }),
   actions: {
     async login(email, password) {
-      const res = await api.post("/auth/login", { email, password });
+      const res = await axios.post("http://localhost:3000/api/auth/login", { email, password });
       this.token = res.data.token;
+      this.userId = res.data.userId;
+      this.role = res.data.role; // récupère le rôle
       localStorage.setItem("token", this.token);
-      this.user = res.data.user;
+      localStorage.setItem("userId", this.userId);
+      localStorage.setItem("role", this.role);
     },
-    async register(email, password) {
-      const res = await api.post("/auth/signup", { email, password });
-      return res.data;
+    async register(userData) {
+      await axios.post("http://localhost:3000/api/auth/signup", userData);
     },
     logout() {
       this.token = null;
-      this.user = null;
+      this.userId = null;
+      this.role = null;
       localStorage.removeItem("token");
-    },
-  },
+      localStorage.removeItem("userId");
+      localStorage.removeItem("role");
+    }
+  }
 });

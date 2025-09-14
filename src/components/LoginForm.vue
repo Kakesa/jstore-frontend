@@ -19,7 +19,12 @@ const router = useRouter();
 const handleLogin = async () => {
   try {
     await auth.login(email.value, password.value);
-    router.push("/dashboard");
+    // Redirection selon rôle
+    if (auth.role === "admin") {
+      router.push("/dashboard");
+    } else {
+      router.push("/my-dashboard");
+    }
   } catch (err) {
     alert("Échec de connexion");
     console.error(err);
