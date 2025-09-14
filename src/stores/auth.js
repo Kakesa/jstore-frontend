@@ -1,4 +1,4 @@
-// stores/auth.js
+// src/stores/auth.js
 import { defineStore } from "pinia";
 import axios from "axios";
 
@@ -13,7 +13,7 @@ export const useAuthStore = defineStore("auth", {
       const res = await axios.post("http://localhost:3000/api/auth/login", { email, password });
       this.token = res.data.token;
       this.userId = res.data.userId;
-      this.role = res.data.role; // récupère le rôle
+      this.role = res.data.role;
       localStorage.setItem("token", this.token);
       localStorage.setItem("userId", this.userId);
       localStorage.setItem("role", this.role);

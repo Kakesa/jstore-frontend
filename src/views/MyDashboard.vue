@@ -1,16 +1,14 @@
 <template>
   <div>
     <h1>Mon Dashboard</h1>
-    <router-link to="/create">➕ Ajouter un objet</router-link>
-
-    <div v-if="things.length === 0">Aucun objet trouvé.</div>
+    <router-link to="/create-thing">➕ Ajouter un objet</router-link>
     <ul>
       <li v-for="thing in things" :key="thing._id">
-        <img :src="thing.imageUrl" alt="" class="preview"/>
+        <img :src="thing.imageUrl" class="preview" />
         <h3>{{ thing.title }}</h3>
         <p>{{ thing.description }}</p>
         <p>{{ thing.price }} €</p>
-        <router-link :to="`/edit/${thing._id}`">Modifier</router-link>
+        <router-link :to="`/edit-thing/${thing._id}`">Modifier</router-link>
         <button @click="deleteThing(thing._id)">Supprimer</button>
       </li>
     </ul>
@@ -47,5 +45,5 @@ onMounted(fetchMyThings);
 </script>
 
 <style scoped>
-.preview { width: 150px; height: 100px; object-fit: cover; }
+.preview { width: 150px; height: 100px; object-fit: cover; margin: 5px 0; }
 </style>
