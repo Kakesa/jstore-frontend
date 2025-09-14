@@ -1,21 +1,13 @@
 <template>
-  <div class="form-container">
-    <h1>Modifier un Objet</h1>
-    <form v-if="thing" @submit.prevent="updateThing">
-      <input v-model="thing.title" type="text" placeholder="Titre" required />
-      <textarea v-model="thing.description" placeholder="Description" required></textarea>
-      <input v-model.number="thing.price" type="number" placeholder="Prix" required />
-
-      <p>Image actuelle :</p>
-      <img :src="thing.imageUrl" alt="Image actuelle" class="preview" />
-
-      <p>Nouvelle image (facultatif) :</p>
-      <input type="file" @change="onFileChange" />
-
-      <button type="submit">Mettre à jour</button>
+  <div class="max-w-md mx-auto mt-6 p-4 border rounded shadow" v-if="thing">
+    <h2 class="text-xl font-bold mb-4">Modifier l'objet</h2>
+    <form @submit.prevent="handleEdit" class="space-y-3">
+      <input v-model="thing.title" type="text" placeholder="Titre" class="border p-2 w-full" required />
+      <textarea v-model="thing.description" placeholder="Description" class="border p-2 w-full" required></textarea>
+      <input v-model.number="thing.price" type="number" placeholder="Prix" class="border p-2 w-full" required />
+      <input type="file" @change="handleFileChange" />
+      <button type="submit" class="bg-yellow-500 text-white px-4 py-2">Modifier</button>
     </form>
-
-    <div v-else>Chargement...</div>
   </div>
 </template>
 
@@ -27,7 +19,11 @@ import axios from "axios";
 const route = useRoute();
 const router = useRouter();
 const thing = ref(null);
-const newImage = ref(null);
+const file = ref(null);
+
+const handleFileChange = (e) => {
+  file.value = e.target.files[0];
+};
 
 const fetchThing = async () => {
   try {
@@ -37,47 +33,26 @@ const fetchThing = async () => {
     thing.value = res.data;
   } catch (err) {
     console.error(err);
-    alert("Erreur de chargement");
+    alert("Erreur lors du chargement de l'objet");
   }
 };
 
-const onFileChange = (e) => {
-  newImage.value = e.target.files[0];
-};
-
-const updateThing = async () => {
+const handleEdit = async () => {
   const formData = new FormData();
-  formData.append("thing", JSON.stringify({
-    title: thing.value.title,
-    description: thing.value.description,
-    price: thing.value.price
-  }));
-
-  if (newImage.value) {
-    formData.append("image", newImage.value);
-  }
+  formData.append("thing", JSON.stringify({ title: thing.value.title, description: thing.value.description, price: thing.value.price }));
+  if (file.value) formData.append("image", file.value);
 
   try {
     await axios.put(`http://localhost:3000/api/stuff/${route.params.id}`, formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-        Authorization: "Bearer " + localStorage.getItem("token")
-      }
+      headers: { Authorization: "Bearer " + localStorage.getItem("token"), "Content-Type": "multipart/form-data" }
     });
-    alert("Objet modifié !");
-    router.push("/");
+    alert("Objet modifié avec succès !");
+    router.push("/my-dashboard");
   } catch (err) {
     console.error(err);
-    alert("Erreur lors de la modification");
+    alert("Erreur lors de la modification de l'objet");
   }
 };
 
 onMounted(fetchThing);
 </script>
-
-<style scoped>
-.form-container { max-width: 600px; margin: auto; padding: 20px; }
-input, textarea { width: 100%; margin: 10px 0; padding: 8px; }
-.preview { max-width: 200px; margin: 10px 0; border-radius: 5px; }
-button { background: orange; color: white; padding: 10px; border: none; cursor: pointer; }
-</style>

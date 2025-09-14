@@ -1,12 +1,12 @@
 <template>
-  <div class="form-container">
-    <h1>Créer un Objet</h1>
-    <form @submit.prevent="createThing">
-      <input v-model="title" type="text" placeholder="Titre" required />
-      <textarea v-model="description" placeholder="Description" required></textarea>
-      <input v-model.number="price" type="number" placeholder="Prix" required />
-      <input type="file" @change="onFileChange" required />
-      <button type="submit">Créer</button>
+  <div class="max-w-md mx-auto mt-6 p-4 border rounded shadow">
+    <h2 class="text-xl font-bold mb-4">Ajouter un objet</h2>
+    <form @submit.prevent="handleCreate" class="space-y-3">
+      <input v-model="title" type="text" placeholder="Titre" class="border p-2 w-full" required />
+      <textarea v-model="description" placeholder="Description" class="border p-2 w-full" required></textarea>
+      <input v-model.number="price" type="number" placeholder="Prix" class="border p-2 w-full" required />
+      <input type="file" @change="handleFileChange" required />
+      <button type="submit" class="bg-green-500 text-white px-4 py-2">Créer</button>
     </form>
   </div>
 </template>
@@ -14,41 +14,35 @@
 <script setup>
 import { ref } from "vue";
 import axios from "axios";
+import { useRouter } from "vue-router";
 
 const title = ref("");
 const description = ref("");
 const price = ref(0);
-const image = ref(null);
+const file = ref(null);
 
-const onFileChange = (e) => {
-  image.value = e.target.files[0];
+const router = useRouter();
+
+const handleFileChange = (e) => {
+  file.value = e.target.files[0];
 };
 
-const createThing = async () => {
+const handleCreate = async () => {
+  if (!file.value) return alert("Veuillez sélectionner une image");
+
   const formData = new FormData();
-  formData.append(
-    "thing",
-    JSON.stringify({ title: title.value, description: description.value, price: price.value })
-  );
-  formData.append("image", image.value);
+  formData.append("thing", JSON.stringify({ title: title.value, description: description.value, price: price.value }));
+  formData.append("image", file.value);
 
   try {
     await axios.post("http://localhost:3000/api/stuff", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-        Authorization: "Bearer " + localStorage.getItem("token")
-      }
+      headers: { Authorization: "Bearer " + localStorage.getItem("token"), "Content-Type": "multipart/form-data" }
     });
-    alert("Objet créé !");
+    alert("Objet créé avec succès !");
+    router.push("/my-dashboard");
   } catch (err) {
     console.error(err);
-    alert("Erreur lors de la création");
+    alert("Erreur lors de la création de l'objet");
   }
 };
 </script>
-
-<style scoped>
-.form-container { max-width: 600px; margin: auto; padding: 20px; }
-input, textarea { width: 100%; margin: 10px 0; padding: 8px; }
-button { background: blue; color: white; padding: 10px; border: none; cursor: pointer; }
-</style>
