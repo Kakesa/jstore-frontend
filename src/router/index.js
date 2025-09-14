@@ -7,6 +7,7 @@ import MyDashboard from "../views/MyDashboard.vue";   // utilisateur
 import AllThings from "../views/AllThings.vue";
 import CreateThing from "../views/CreateThing.vue";
 import EditThing from "../views/EditThing.vue";
+import { createRouter, createWebHistory } from "vue-router";
 
 const routes = [
   { path: "/", name: "Home", component: Home },
