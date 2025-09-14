@@ -11,6 +11,7 @@
           <p>{{ thing.description }}</p>
           <p><strong>{{ thing.price }} €</strong></p>
           <button @click="deleteThing(thing._id)">🗑️ Supprimer</button>
+          <button @click="$router.push(`/edit-thing/${thing._id}`)">✏️ Modifier</button>
         </div>
       </div>
     </div>
